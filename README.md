@@ -5,3 +5,4 @@ Librairies:
 * python
 * kivy
 * kivymd
+* psycopg
