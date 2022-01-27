@@ -1,0 +1,13 @@
+#:import environ os.environ
+
+<BakeryLogo@MDBoxLayout>
+    orientation: "vertical"
+    padding: "8dp"
+    size_hint_y: None
+    size_hint_x: .5
+    height: "180dp"
+    pos_hint: {"center_x": .5}
+
+    Image:
+        id: image_logo
+        source: f"{environ['BOULANGERIE_ROOT']}/assets/logo.png"

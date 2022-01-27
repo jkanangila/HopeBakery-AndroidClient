@@ -1,0 +1,13 @@
+<LoadingScreen@Screen>
+    name: "loading-screen"
+
+    FloatLayout:
+        MDSpinner:
+            size_hint: .1,.1
+            pos_hint:{"center_x":.5, "center_y":.5}
+
+        MDLabel:
+            text: 'Chargement des données en cours. Patienter'
+            bold: True
+            pos_hint:{"center_y":.4}
+            halign: "center"

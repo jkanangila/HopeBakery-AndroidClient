@@ -1,0 +1,92 @@
+
+<LogInScreen>:
+    MDBoxLayout:
+        adaptive_height: True
+        orientation: "vertical"
+        spacing: dp(40)
+        padding: dp(30)
+        pos_hint: {"center_x": .5}
+        size_hint_x: .8
+
+        BoxLayout:
+
+        BakeryLogo:
+
+        MDBoxLayout:
+            id: _login_boxlayout
+            adaptive_height: True
+            orientation: "vertical"
+            spacing: dp(20)
+
+        MDBoxLayout:
+            adaptive_height: True
+            orientation: "vertical"
+            spacing: dp(20)
+
+            MDIconButton:
+                id: lock_button
+                icon: "lock-open"
+                user_font_size: sp(62)
+                _no_ripple_effect: True
+                pos_hint: {"center_x": .5}
+                theme_text_color: "Custom"
+                text_color: app.custom_focus_color
+                disabled: app.login_disabled
+                on_release:
+                    # app.login_disabled = True
+                    root._retrieve_session_info()
+
+<PasswordField>
+    id: pswd
+    hint_text: "Mot de passe"
+    pos_hint:{"center_x":.5}
+    size_hint_x: .65
+    on_text: root.parent.parent.parent.password = self.text
+    password: True
+    password_mask: "*"
+    on_text_validate:
+        root.parent.parent.parent._retrieve_session_info()
+    # color_mode: "custom"
+    # line_color_focus: app.custom_focus_color
+    # line_color_normal: app.custom_normal_color
+
+<UserChip>
+    text: "User"
+    text_color: app.text_color_2
+    icon_color: app.text_color_2
+    color: app.custom_normal_color
+    selected_chip_color: app.custom_focus_color
+
+    on_release:
+        self.parent.parent.parent.parent.update_session_info(self)
+
+<ErrorBox>
+    id: _error_box
+    orientation: "vertical"
+    _font_color: 1,0,0,1
+    size_hint_y: None
+    height: '120dp'
+    pos_hint: {"center_x":.5, "center_y":.5}
+    spacing: '25dp'
+
+    MDIcon:
+        icon: "alert"
+        font_size: "90sp"
+        color: self.parent._font_color
+        halign: "center"
+        valign: "middle"
+        
+        # size_hint: None,None
+        # size: _error_msg.texture_size[1], _error_msg.texture_size[1]*1.1
+
+    Label:
+        id: _error_msg
+        # adaptive_size: True
+        text: "Veuillez connecter votre appareil à l'Internet".upper()
+        halign: "center"
+        valign: "middle"
+        color: self.parent._font_color
+        font_size: "20sp"
+        # size_hint: None, None
+        # height: self.texture_size[1]
+        # width: self.texture_size[0]

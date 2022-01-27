@@ -1,0 +1,7 @@
+kivymd
+psycog2
+webbrowser
+functools
+urllib
+http
+beautifulsoup4

@@ -1,0 +1,85 @@
+#:import environ os.environ
+#:import gch kivy.utils.get_color_from_hex
+#:import toast kivymd.toast.toast
+
+#:import FadeTransition kivy.uix.screenmanager.FadeTransition
+#:import StiffScrollEffect kivymd.effects.stiffscroll.StiffScrollEffect
+
+#:import NavigationItem libs.baseclass.tabnavigation.NavigationItem
+#:import NavigationBar libs.baseclass.tabnavigation.NavigationBar
+
+#:import CaisseScreen libs.baseclass.caisse_screen.CaisseScreen
+#:import JettonScreen libs.baseclass.jettons_screen.JettonScreen
+#:import CustomerScreen libs.baseclass.customer_screen.CustomerScreen
+
+
+<BakeryHomeScreen@MDScreen>
+
+    MDBoxLayout:
+
+        NavigationBar:
+            id: nav_bar
+
+            NavigationItem:
+                text: "CLIENTS"
+                icon: "account-group"
+                on_release:
+                    scr_manager.transition.direction = "right"
+                    scr_manager.current = "customer screen"
+
+            NavigationItem:
+                text: "CAISSE"
+                icon: "cart"
+                on_release:
+                    scr_manager.transition.direction = "left" \
+                    if scr_manager.current == "customer screen" \
+                    else "right"
+                    scr_manager.current = "caise screen"
+
+            NavigationItem:
+                text: "LIVRAISON"
+                icon: "truck-delivery"
+                on_release:
+                    scr_manager.transition.direction = "left"
+                    scr_manager.current = "jetton screen"
+
+            NavigationItem:
+                text: "ACCUEIL"
+                icon: "arrow-left-bold"
+                quiter: 0
+                on_release:
+                    if self.quiter == 0: toast("Appuyer encore pour rentrez \u00e0 l'\u00e9cran d'accueil") 
+                    if self.quiter: app.root.current = "login screen"
+                    self.quiter += 1
+                    if self.quiter and app.root.current == "login screen": self.quiter = 0
+
+            NavigationItem:
+                text: "QUITTEZ"
+                icon: "close-circle"
+                quiter: 0
+                on_release:
+                    if self.quiter == 0: toast("Appuyer encore pour quittez l'application") 
+                    if self.quiter: exit()
+                    self.quiter += 1
+
+        MDBoxLayout:
+            id: _content_box_layout
+            orientation: 'vertical'
+
+            ###########
+            # TOOLBAR #
+            ##########
+            MainToolbar:
+                id: toolbar
+
+            ScreenManager:
+                id: scr_manager
+
+                CustomerScreen:
+                    name: "customer screen"
+
+                CaisseScreen:
+                    name: "caise screen"
+
+                JettonScreen:
+                    name: "jetton screen"

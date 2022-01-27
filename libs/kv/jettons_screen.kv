@@ -1,0 +1,146 @@
+#:import gch kivy.utils.get_color_from_hex
+#:import Thread threading.Thread
+# :import MainToolbar libs.baseclass.toolbar.MainToolbar
+
+<JettonScreen>:
+    id: jettons_screeen
+
+    MDBoxLayout:
+        id: mainbox_screen_1
+        orientation: "vertical"
+
+        ##########
+        #   LOGO #
+        ##########
+        BakeryLogo:
+            id: logo
+
+        ################
+        #   MAIN BODY  #
+        ################
+        BoxLayout:
+            orientation: "vertical"
+            id: text_field
+            # cols: 1
+            # padding: [0, 0, 0, 10]
+            spacing: "20dp"
+            size_hint_x: .8
+            pos_hint: {"center_x": .5}
+            size_hint_y: None
+            height: self.minimum_height
+
+            # MAIN TEXT FIELD
+            #################
+            MDTextField
+                id: txt_input
+                mode: "rectangle"
+                color_mode: "custom"
+                line_color_focus: app.custom_normal_color
+                line_color_normal: gch("#2A1C10")
+
+                max_height: "180dp"
+                multiline: True
+                hint_text: "Clicker ici, puis commencer a scanner"
+                helper_text: "Appuyer sur 'Pointer' quand vous aurez finis"
+                helper_text_mode: "on_focus"
+
+                on_focus:
+                    root.adjust_logo_on_focus(self.focus, logo, bot_space_holder)
+
+            MDRelativeLayout:
+                size_hint_y: None
+                height: date_field.height
+                size_hint_x: None
+                width: dp(160)
+                pos_hint: {"center_x": .5}
+
+                # DATE TEXT FIELD
+                #################
+                MDTextFieldRound:
+                    id: date_field
+                    hint_text: "Date de livraison"
+                    normal_color: 1,1,1,1
+                    color_active: 1,1,1,1
+                    line_color: app.custom_normal_color
+                    multiline: False
+
+                # CALENDAR ICON
+                ###############
+                MDIconButton:
+                    id: calendar
+                    icon: "calendar"
+                    ripple_scale: .5
+                    pos_hint: {"center_y": .5}
+                    pos: date_field.width - self.width + dp(8), 0
+                    opposite_colors: True
+                    text_color: gch("#2A1C10")
+                    theme_text_color: "Custom"
+                    on_release:
+                        root.show_date_picker()
+
+            # SUBMIT BUTTON
+            ###############
+            MDFillRoundFlatButton:
+                id: submit
+                text: "POINTER"
+                theme_text_color: "Custom"
+                text_color: 1, 1, 1, 1
+                font_size: "18sp"
+                font_name: "Raleway"
+                bold: True
+                md_bg_color: app.custom_focus_color
+                pos_hint: {"center_x": .5}
+
+                on_release: 
+                    Thread(target=root.submit, args=(txt_input.text, date_field.text), daemon=True).start()
+
+
+        Widget:
+            size_hint_y: None
+            height: dp(20)
+
+        # INVALID DATA DISPLAY BOX
+        ##########################
+        BoxLayout:
+            orientation: 'vertical'
+            size_hint_x:.85
+            pos_hint: {"center_x": .5}
+            padding: dp(10)
+            spacing: dp(10)
+            # opacity: root.recycle_opacity
+
+            canvas.before:
+                Color:
+                    rgba: 0,0,0,.5
+                Line:
+                    width: 1
+                    rounded_rectangle: self.x, self.y, self.width, self.height, 10
+            
+            MDLabel:
+                text: "Les données invalides seront affichées ici"
+                italic: True
+                size_hint_y: None
+                height: self.texture_size[1]
+
+            RecycleView:
+                id: invalid_data
+                key_viewclass: "viewclass"
+                key_size: "height"
+                padding: dp(10)
+                data: root.invalid_data
+
+                RecycleGridLayout:
+                    default_size: None, dp(35)
+                    default_size_hint: 1, None
+                    size_hint_y: None
+                    height: self.minimum_height
+                    cols: 1
+
+        Widget:
+            size_hint_y: None
+            height: dp(20)
+
+        BoxLayout:
+            id: bot_space_holder
+            size_hint_y: None
+            height: dp(0)

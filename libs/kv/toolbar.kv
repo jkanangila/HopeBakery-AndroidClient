@@ -1,0 +1,77 @@
+#:import gch kivy.utils.get_color_from_hex
+#:import Thread threading.Thread
+
+
+<MainToolbar@MDBoxLayout>
+    md_bg_color: app.custom_focus_color
+
+    size_hint_y: None
+    height: "45dp"
+    padding: "10dp"
+    pos_hint: {"top": 1}
+
+
+    # REFRESH ICON
+    ##############
+    MDIconButton:
+        id: refresh
+        icon: "refresh"
+        pos_hint: {"center_y": .5}
+        theme_text_color: "Custom"
+        text_color: app.text_color_2
+        on_release:
+            Thread(target=app.refresh_session_info, daemon=True).start()
+
+    # TOOLBAR TITLE
+    ###############
+    MDLabel:
+        id: title
+        text: "BOULANGERIE D'ESPERANCE"
+        color: app.text_color_2
+        font_size: app._heading_font_size
+        font_name: "Raleway"
+        bold: True
+
+    MDBoxLayout:
+        pos_hint: {"center_x": .5}
+        spacing: 10
+
+        # PROGRESS SPINNER
+        ##################
+        MDSpinner:
+            size_hint: None, None
+            size: dp(25), dp(25)
+            active: app.spinner_state
+            color: app.custom_normal_color
+
+        MDBoxLayout:
+            orientation: 'vertical'
+            spacing: dp(10)
+
+            # PROGRES BAR
+            #############
+            MDProgressBar:
+                canvas:
+                    Clear
+                    Color:
+                        rgba: app.pg_bar_col
+                    Rectangle:
+                        size: (self.width, dp(4))
+                        pos: (self.x, self.center_y - dp(4))
+
+                    Color:
+                        rgba: app.custom_normal_color
+                    Rectangle:
+                        size: (self.width*self.value_normalized, sp(4))
+                        pos: (self.x, self.center_y - dp(4))
+
+                value: app.pg_bar_val
+
+            # LABEL PG BAR
+            ##############
+            MDLabel:
+                text: app.pg_bar_text_val
+                color: app.text_color_2
+                font_size: sp(11)
+                italic: True
+                markup: True

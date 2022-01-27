@@ -1,0 +1,167 @@
+#:import Thread threading.Thread
+
+<CustomerScreen>
+    BoxLayout:
+        orientation: "vertical"
+        spacing: '10dp'
+        padding: '20dp'
+
+        MDBoxLayout:
+            adaptive_height: True
+
+            ## SEARCH ICON
+            ##############
+            MDIconButton:
+                icon: "magnify"
+
+            # MDBoxLayout:
+            #     size_hint_x: None
+            #     width: dp(190)
+
+            MDRelativeLayout:
+                size_hint_y: None
+                height: search_field.height
+                size_hint_x: None
+
+                ## SEARCH FIELD
+                ###############
+                MDTextField:
+                    id: search_field
+                    hint_text: "Numéro ou nom du client"
+                    on_text: root.set_customers_list(self.text, True)
+                    size_hint_x: None
+                    width: dp(205)
+
+                # CALENDAR ICON
+                ###############
+                MDIconButton:
+                    id: calendar
+                    icon: "calendar"
+                    ripple_scale: .5
+                    pos_hint: {"center_y": .5}
+                    pos: search_field.width - self.width + dp(14), 0
+                    opacity: 0
+                    # opposite_colors: True
+                    text_color: app.custom_normal_color
+                    theme_text_color: "Custom"
+                    on_release:
+                        root.show_date_picker()
+
+                ## REFRESH ICON
+                ###############
+                MDIconButton:
+                    id: refresh
+                    icon: "refresh-circle"
+                    pos: search_field.width + dp(15), 0
+                    pos_hint: {"center_y": .5}
+                    opacity: 0
+                    theme_text_color: "Custom"
+                    text_color: app.custom_normal_color
+                    on_release:
+                        confirmer.opacity = 1
+                        Thread(target=root.set_inactif_agents, kwargs={"date":search_field.text}, daemon=True).start()
+
+                ## CONFIRM CHIP
+                ###############
+                SortChip:
+                    id: confirmer
+                    text: "Confirmer"
+                    # icon: "check-circle"
+                    icon: ""
+                    pos: search_field.width + dp(75), 0
+                    pos_hint: {"center_y": .5}
+                    opacity: 0
+                    on_release:
+                        root.open_dialog(search_field.text)
+
+        MDBoxLayout:
+            adaptive_height: True
+            orientation: "vertical"
+
+            MDChooseChip:
+                pos_hint: {"center_x": .5}
+
+                ## CLIENTS ACTIF
+                ################
+                SortChip:
+                    text: "Clients Actif"
+                    icon: ""
+                    on_release:
+                        root.sort_order = self.text
+                        root.set_customers_list()
+
+                        calendar.opacity = 0
+                        refresh.opacity = 0
+                        confirmer.opacity = 0
+                        search_field.hint_text = "Numéro ou nom du client"
+                        search_field.text = ""
+                        # search_field.readonly = False
+
+                ## Clients Déclassé
+                ###################
+                SortChip:
+                    text: 'Clients Déclassé'
+                    icon: ""
+                    on_release:
+                        root.sort_order = self.text
+                        root.set_customers_list()
+
+                        calendar.opacity = 0
+                        refresh.opacity = 0
+                        confirmer.opacity = 0
+                        search_field.hint_text = "Nom du client"
+                        search_field.text = ""
+                        # search_field.readonly = False
+
+                ## Numéro vide
+                ##############
+                SortChip:
+                    text: 'Numéro vide'
+                    icon: ""
+                    on_release:
+                        root.sort_order = self.text
+                        Thread(target=root.set_customers_list, daemon=True).start()
+
+                        calendar.opacity = 0
+                        refresh.opacity = 0
+                        confirmer.opacity = 0
+                        search_field.hint_text = "Numéro vide"
+                        search_field.text = ""
+                        # search_field.readonly = False
+
+                ## Déclassé les clients inactif
+                ###############################
+                SortChip:
+                    text: 'Déclassé les clients inactif'
+                    icon: ""
+                    on_release:
+                        root.sort_order = self.text
+
+                        calendar.opacity = 1
+                        refresh.opacity = 1
+                        search_field.hint_text = "Période d'inactivité"
+                        # search_field.readonly = True
+                        root.data = []
+
+        ## RECYCLEVIEW 
+        ###############
+        RecycleView:
+            id: rv
+            key_viewclass: "viewclass"
+            key_size: "height"
+            data: root.data
+
+            RecycleGridLayout:
+                default_size: None, dp(48)
+                default_size_hint: 1, None
+                size_hint_y: None
+                height: self.minimum_height
+                cols: 1
+
+    BoxLayout:
+
+<SortChip@MDChip>
+    text_color: app.text_color_2
+    icon_color: app.text_color_2
+    color: app.custom_normal_color
+    selected_chip_color: app.custom_focus_color

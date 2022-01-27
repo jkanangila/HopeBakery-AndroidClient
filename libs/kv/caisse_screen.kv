@@ -1,0 +1,260 @@
+#:import ListingItemRow libs.baseclass.caisse_screen.ListingItemRow
+#:import date datetime.date
+# :import MainToolbar libs.baseclass.toolbar.MainToolbar
+
+<InfoIconButton@MDIconButton>
+    ripple_scale: 0
+    theme_text_color: "Custom"
+    text_color: app.custom_normal_color
+
+<InfoListItem@BoxLayout>
+    size_hint_y: None
+    height: _txt.height + dp(5)
+    _icon: ""
+    _text: ""
+
+    BoxLayout:
+        x: root.x + root.width - self.width
+        y: root.y + root.height/2 - self.height/2
+        size_hint: None,None
+        size: '40dp','40dp'
+
+        InfoIconButton:
+            icon: root._icon
+
+    BoxLayout:
+        size_hint_y: None
+        height: _txt.height
+        padding: ('10dp', '0dp', '0dp', '13dp')
+        pos: root.pos
+
+        MDLabel:
+            id: _txt
+            text: root._text
+            font_name: "RobotoLight"
+            size_hint_y: None
+            height: self.texture_size[1]
+            markup: True
+            font_size: sp(12)
+
+<LabelBorder@MDLabel>:
+    halign: "center"
+    _color: 1,1,1,1
+    markup: True
+    bold: True
+    font_size: app._heading_font_size
+
+    canvas:
+        Color:
+            rgba: app.custom_focus_color
+        Line:
+            width: 1
+            rectangle: self.x, self.y, self.width, self.height
+    canvas.before:
+        Color:
+            rgba: self._color
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+# Box layout with canvas for color and border
+<CanvasBox@BoxLayout>
+    _color: 1,1,1,1
+
+    canvas:
+        Color:
+            rgba: app.custom_focus_color
+        Line:
+            width: 1
+            rectangle: self.x, self.y, self.width, self.height
+    canvas.before:
+        Color:
+            rgba: self._color
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+<ListingItemRow>:
+    size_hint_y: None
+    height: dp(35)
+    _bold: False
+
+    #######################
+    ## Delivery Checkbox ##
+    #######################
+    CanvasBox:
+        size_hint_x: .05
+        _color: root.bg_col
+
+        MDCheckbox:
+            id: deliver_updated
+            size_hint: None, None
+            size: self.parent.height, self.parent.width
+            pos_hint: {"center_y":.5}
+            active: root.is_delivered
+            disabled: root.delivery_disabled
+            on_active:
+                root.update_delivery(root)
+
+    #################
+    ## Card number ##
+    #################
+    MDBoxLayout:
+        size_hint_x: .1
+        
+        LabelBorder:
+            text: root.no
+            _color: root.bg_col
+            bold: root._bold
+
+    ###################
+    ## Nom du client ##
+    ###################
+    MDBoxLayout:
+        size_hint_x: .35
+
+        LabelBorder:
+            text: root.name
+            _color: root.bg_col
+            bold: root._bold
+
+    ###########
+    ## Debit ##
+    ###########
+    MDBoxLayout:
+        size_hint_x: .15
+
+        LabelBorder:
+            text: root.debit
+            _color: root.bg_col
+            bold: root._bold
+
+    ##############
+    ## Commande ##
+    ##############
+    MDBoxLayout:
+        size_hint_x: .15
+        
+        LabelBorder:
+            text: root.commande
+            _color: root.bg_col
+            bold: root._bold
+        
+
+    ####################
+    ## CONFIRM BUTTON ##
+    ####################
+    CanvasBox:
+        size_hint_x: .1
+        _color: root.bg_col
+
+        CustomIconButton:
+            id: confirm_button
+            icon: root.confirm_button
+            text_color: 0, 1, 0, 1
+            halign: "center"
+            pos_hint:{"center_y":.5, "center_x":.5}
+            data: root.data
+            disabled: root.confirm_button_disabled
+            on_release:
+                self.disabled = True
+                remove_button.disabled = True
+                root.confirmer_commande(root)
+
+    ##################
+    ## CLEAR BUTTON ##
+    ##################
+    CanvasBox:
+        size_hint_x: .1
+        _color: root.bg_col
+
+        Widget:
+            size_hint_x: None
+            width: dp(15)
+
+        CustomIconButton:
+            id: remove_button
+            icon: root.remove_button
+            halign: "center"
+            pos_hint:{"center_y":.5}
+            disabled: root.confirm_button_disabled
+            on_release: root.delete_row(root)
+
+<CaisseScreen>
+    MDBoxLayout:
+        orientation: "vertical"
+        spacing: "20dp"
+
+        ###################
+        # INFORMATION BOX #
+        ##################
+        MDBoxLayout:
+            id: info
+            size_hint_y: None
+            height: self.minimum_height
+            padding: [50,10,50,0]
+
+            GridLayout:
+                size_hint_y: None
+                height: self.minimum_height
+                cols:2
+                padding:[0,dp(10),0,0]
+                spacing: dp(10)
+
+                InfoListItem:
+                    _text: root.operator_name
+                    _icon: "account-outline"
+
+                InfoListItem:
+                    id: total_debit
+                    _text: "Esp\u00e8ces: CDF 0.00"
+                    _icon: "cash-plus"
+
+                InfoListItem:
+                    _text: root.sales_site
+                    _icon: "home-city-outline"
+
+                InfoListItem:
+                    id: total_credit
+                    _text: "Cr\u00e9dit: CDF 0.00"
+                    _icon: "cash-minus"
+
+                InfoListItem:
+                    _text: f"{date.today():%Y-%m-%d}"
+                    _icon: "calendar"
+
+                InfoListItem:
+                    id: total_commande
+                    _text: "Commande: CDF 0.00"
+                    _icon: "cash-multiple"
+
+            InfoIconButton:
+                icon: "cart-plus"
+                pos_hint: {"center_y": .5}
+                ripple_scale: 0
+                user_font_size: '45sp'
+
+                on_release:
+                    root.placer_une_comande()
+
+        ###########
+        # LISTING #
+        ##########
+        MDBoxLayout:
+            id: box_scroll
+            padding: [50,0,50,0]
+
+            ## RECYCLEVIEW 
+            ############### 
+            RecycleView:
+                id: listing
+                key_viewclass: "viewclass"
+                key_size: "height"
+                data: root.order_book
+
+                RecycleGridLayout:
+                    default_size: None, dp(35)
+                    default_size_hint: 1, None
+                    size_hint_y: None
+                    height: self.minimum_height
+                    cols: 1

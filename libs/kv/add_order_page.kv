@@ -1,0 +1,325 @@
+#:import Window kivy.core.window.Window
+#:import date datetime.date
+
+# SECTION RULES
+
+# ANCHOR MyGrid
+<MyGrid@GridLayout>
+    cols: 3
+    spacing: '20dp'
+    size_hint_y: None
+    height: self.minimum_height
+    # adaptive_height: True
+
+# ANCHOR CustomIconButton
+##########################################################################
+<CustomIconButton@ButtonBehavior+MDIcon>
+    # TODO Add ripples
+    font_size: "25sp"
+
+    # Reduce Canvas
+    size_hint: None,None
+    font_size: "30sp"
+    width: "55dp"
+    height: "48dp"
+
+    # Appearance
+    theme_text_color: "Custom"
+    text_color: 1, 0, 0, 1
+
+<EditButton@CustomIconButton>:
+    icon: "pen-minus"
+    text_color: app.custom_normal_color
+##########################################################################
+
+# ANCHOR CustomLabel
+<CustomLabel@MDLabel>
+    size_hint_x: None
+    width: "120dp"
+    bold: True
+    markup: True
+
+# ANCHOR CustomChip
+<CustomChip@MDChip>
+    text_color: 1,1,1,1
+    icon_color: 1,1,1,1
+    color: app.custom_normal_color
+    selected_chip_color: app.custom_focus_color
+
+# ANCHOR EmptySpace
+<EmptySpace@Widget>
+    size_hint_y: None
+    height: dp(10)
+
+# ANCHOR AddorderItem
+<AddorderItem>
+    icon: "cart-plus"
+    font_size: "40sp"
+
+    # Reduce Canvas
+    size_hint: None,None
+    width: self.texture_size[0]
+    height: self.texture_size[1]
+    adaptive_size: True
+
+    # Appearance
+    theme_text_color: "Custom"
+    text_color: 1, 0, 0, 1
+
+# ANCHOR CustomTextField
+<CustomTextField@MDTextField>
+    mode: "rectangle"
+    size_hint_x: None
+    width: "200dp"
+    multine: False
+    input_filter: "int"
+    on_text_validate:
+        self.text = f"CDF {float(self.text):,.2f}"
+        # self.readonly = True
+    on_focus:
+        # TODO Modify here
+        self.parent.parent.parent.parent.validate_text_on_unfocus(self)
+# !SECTION
+
+# SECTION POP UP 
+##########################################################################
+# ANCHOR MyContent
+<MyContent>
+    size_hint_y: None
+    height: Window.size[1]*.7
+
+    ScrollView:
+        do_scroll_x: False
+        do_scroll_y: True
+
+        GridLayout:
+            id: main_grid
+            cols: 1
+            spacing: '10dp'
+            padding: ('10dp', '10dp', '10dp', '10dp')
+            size_hint_y: None
+            height: self.minimum_height
+
+            # Color instructions for app
+            background_color: 1,1,1,1
+            bk_normal_color: app.custom_normal_color
+            bk_focus_color: app.custom_focus_color
+
+            # ANCHOR Numero carte
+            ##################################################################
+            ##################
+            ## Numero carte ##
+            ##################
+            MyGrid:
+                cols: 3
+                spacing: '30dp'
+
+                CustomLabel:
+                    text: "No. Carte"
+                    # width: "90dp"
+
+                MDTextField:
+                    id: no_carte
+                    mode: "rectangle"
+                    hint_text: "Carte"
+                    max_text_length: 4
+                    size_hint_x: None
+                    width: "55dp"
+
+                CustomIconButton:
+                    icon: "check-circle"
+                    text_color: 0,1,0,1
+
+                    on_release:
+                        root.display_customer_name(no_carte.text, nom_du_client)
+
+            EmptySpace:
+
+            CustomLabel:
+                id: nom_du_client
+                text: "Nom du client"
+                font_size: "30sp"
+                size_hint_x: 1
+                size_hint_y: None
+                height: self.texture_size[1]
+
+            EmptySpace:
+                height: dp(5)
+
+            MDSeparator:
+            ##################################################################
+
+            # ANCHOR Description
+            ##################################################################
+            #################
+            ## Description ##
+            #################
+            EmptySpace:
+
+            MyGrid:
+
+                CustomLabel:
+                    text:'Description: '
+                    
+
+                MDLabel:
+                    id: description
+                    text: normal.text
+                    # color: 1,0,0,1
+                    bold: True
+
+            EmptySpace:
+                height: dp(5)
+
+            GridLayout:
+                cols: 1
+                size_hint_y: None
+                height: self.minimum_height
+                padding: ('50dp', '0dp', '0dp', '0dp')
+
+                MDChooseChip:
+
+                    CustomChip:
+                        id: normal
+                        text: "Normal"
+                        # icon: "cash-register"
+                        icon: ""
+                        on_release:
+                            description.text = self.text
+
+                    CustomChip:
+                        id: vente
+                        text: "Vente Sans Commission"
+                        # icon: "cash-multiple"
+                        icon: ""
+                        on_release: 
+                            description.text = self.text
+
+                    CustomChip:
+                        id: credit_payment
+                        text: "Credit Payment"
+                        # icon: "cash-refund"
+                        icon: ""
+                        on_release: 
+                            description.text = self.text
+
+            MDSeparator:
+            ##################################################################
+
+            # ANCHOR COMMANDE
+            ##################################################################
+            ##############
+            ## COMMANDE ##
+            ##############
+            EmptySpace:
+
+            MyGrid:
+                CustomLabel:
+                    text: "Commande:"
+
+
+                CustomTextField:
+                    id: commande_amount
+                    hint_text: "Montant de la commande"
+
+                EditButton:
+                    on_release: 
+                        commande_amount.text = ""
+                        commande_amount.readonly = False
+
+            MDSeparator:
+            ##################################################################
+
+
+            # ANCHOR Debit
+            ##################################################################
+            ###########
+            ## Debit ##
+            ###########
+            EmptySpace:
+
+            MyGrid:
+                CustomLabel:
+                    text: "Debit:"
+
+                CustomTextField:
+                    id: debit_amount
+                    hint_text: "Montant de en esp\u00e8ce"
+
+                EditButton:
+                    on_release: 
+                        debit_amount.text = ""
+                        debit_amount.readonly = False
+
+            MDSeparator:
+            ##################################################################
+
+            # ANCHOR CREDIT
+            ##################################################################
+            ############
+            ## CREDIT ##
+            ############
+            EmptySpace:
+
+            MyGrid:
+                CustomLabel:
+                    text: "Credit:"
+
+                CustomTextField:
+                    id: credit_amount
+                    hint_text: "Cr\u00e9dit donn\u00e9 au client"
+
+                EditButton:
+                    on_release: 
+                        credit_amount.text = ""
+                        credit_amount.readonly = False
+
+            MDSeparator:
+            ##################################################################
+
+            # ANCHOR DATE
+            ##################################################################
+            ##########
+            ## DATE ##
+            ##########
+            EmptySpace:
+
+            MyGrid:
+                CustomLabel:
+                    text: "Date:"
+
+                MDTextField:
+                    id: commande_date
+                    mode: "rectangle"
+                    text: f"{date.today():%Y-%m-%d}"
+                    hint_text: ""
+                    size_hint_x: None
+                    width: "200dp"
+                    multine: False
+                    readonly: True
+
+                # EditButton:
+                #     icon: "calendar"
+                #     on_release: ""
+
+            MDSeparator:
+            ##################################################################
+
+            # ANCHOR LIVRAISON
+            ##################################################################
+            ###############
+            ## LIVRAISON ##
+            ###############
+            MyGrid:
+                MDCheckbox:
+                    id: delivery_status
+                    size_hint: None, None
+                    width: '48dp'
+                    height: '48dp'
+
+                MDLabel:
+                    text: "Livr\u00e9"
+                    bold: True
+            ##################################################################
+##########################################################################
+#!SECTION
